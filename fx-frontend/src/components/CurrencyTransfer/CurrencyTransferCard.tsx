@@ -1,16 +1,10 @@
-import {
-  Box,
-  Button,
-  Grid,
-  MenuItem,
-  TextField,
-  Typography,
-  styled,
-} from "@mui/material";
+import { Box, Button, Grid, Typography, styled } from "@mui/material";
 import ImgConvertIcon from "../../assets/converter-icon.png";
 import ImgConverterSwapIcon from "../../assets/converter-swap-icon.png";
 import theme from "../../config/theme";
 import { useCurrenciesQuery } from "../../hooks/useCurrenciesQuery";
+import { useState } from "react";
+import { CurrencyInputs } from "./CurrencyInputs";
 const CurrencyTransferCard = () => {
   const StyledButton = styled(Button)({
     backgroundColor: theme.palette.bluePrimary.main,
@@ -22,6 +16,14 @@ const CurrencyTransferCard = () => {
     width: "180px",
   });
   const { data: currencies, isLoading } = useCurrenciesQuery();
+  const [currencyFrom, setCurrencyFrom] = useState(""); //FIX: Remove this state or wrap all the vars in an obj
+  const handleCurrencyChange = (value: string) => {
+    //setCurrencyFrom(value);
+    console.log("value from parent: ", value);
+  };
+  const handleAmountMoneyChange = (value: number) => {
+    console.log("value from parent...: ", value);
+  };
   if (isLoading) {
     return <span>Loading...</span>;
   }
@@ -56,21 +58,11 @@ const CurrencyTransferCard = () => {
             </Box>
           </Box>
           <Box sx={{ mb: 3 }}>
-            <TextField
-              id="outlined-select-currency"
-              size="small"
-              select
-              label="From"
-              defaultValue="EUR"
-              helperText="Please select your currency"
-            >
-              {currencies.map((option) => (
-                <MenuItem key={option.code} value={option.code}>
-                  {option.code}
-                </MenuItem>
-              ))}
-            </TextField>
-            <TextField size="small" variant="outlined" />
+            <CurrencyInputs
+              currencies={currencies}
+              onCurrencyChange={handleCurrencyChange}
+              onAmountMoneyChange={handleAmountMoneyChange}
+            />
           </Box>
           <Box sx={{ mx: "auto", textAlign: "center" }}>
             <img
@@ -82,21 +74,13 @@ const CurrencyTransferCard = () => {
             />
           </Box>
           <Box sx={{ mt: 3 }}>
-            <TextField
-              id="outlined-select-currency"
-              size="small"
-              select
-              label="To"
-              defaultValue="USD"
-              helperText="Please select your currency"
-            >
-              {currencies.map((option) => (
-                <MenuItem key={option.code} value={option.code}>
-                  {option.code}
-                </MenuItem>
-              ))}
-            </TextField>
-            <TextField size="small" variant="outlined" />
+            <CurrencyInputs
+              isFrom={false}
+              defaultCurrency="USD"
+              currencies={currencies}
+              onCurrencyChange={handleCurrencyChange}
+              onAmountMoneyChange={handleAmountMoneyChange}
+            />
           </Box>
           <Box
             sx={{
