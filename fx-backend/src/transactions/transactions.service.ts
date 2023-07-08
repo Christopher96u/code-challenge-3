@@ -7,7 +7,7 @@ export class TransactionsService {
       {
         symbol: 'USD',
         sourceAmount: 100,
-        argetAmount: 100,
+        targetAmount: 100,
         fee: 0,
         createdAt: '2021-08-01T00:00:00.000Z',
       },

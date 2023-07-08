@@ -8,6 +8,7 @@ import {
   TableRow,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import { useTransactionsQuery } from "../../hooks/useTransactionsQuery";
 const tableHeaders: string[] = [
   "Symbol",
   "Source Amount",
@@ -65,6 +66,10 @@ const TransactionsTable = () => {
   const StyledTableHead = styled(TableHead)(() => ({
     borderTop: "1px solid #e0e0e0",
   }));
+  const { data } = useTransactionsQuery();
+  if (data) {
+    console.log(data);
+  }
   return (
     <TableContainer
       component={Paper}
