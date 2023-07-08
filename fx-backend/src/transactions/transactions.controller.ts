@@ -9,17 +9,20 @@ import {
 } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
+import { Transaction } from './entities/transaction.entity';
 
 @Controller('transactions')
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
   @Get()
-  findAll() {
+  findAll(): Promise<Transaction[]> {
     return this.transactionsService.findAll();
   }
 
   @Post()
-  create(@Body() createTransactionDto: CreateTransactionDto) {
+  create(
+    @Body() createTransactionDto: CreateTransactionDto,
+  ): Promise<Transaction> {
     return this.transactionsService.create(createTransactionDto);
   }
 

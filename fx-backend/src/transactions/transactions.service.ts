@@ -1,22 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Transaction } from './entities/transaction.entity';
+import { Repository } from 'typeorm';
 @Injectable()
 export class TransactionsService {
-  findAll(): any {
-    const tempData = [
-      {
-        symbol: 'USD',
-        sourceAmount: 105,
-        targetAmount: 970,
-        fee: 24.99,
-        createdAt: '2021-08-01T00:00:00.000Z',
-        id: 132,
-      },
-    ];
-    return tempData;
+  constructor(
+    @InjectRepository(Transaction)
+    private transactionsRepository: Repository<Transaction>,
+  ) {}
+  findAll(): Promise<Transaction[]> {
+    return this.transactionsRepository.find();
   }
-  create(createTransactionDto: CreateTransactionDto): any {
-    return createTransactionDto;
+  create(createTransactionDto: CreateTransactionDto): Promise<Transaction> {
+    return this.transactionsRepository.save(
+      this.transactionsRepository.create(createTransactionDto),
+    );
   }
   remove(id: number): any {
     return id;
