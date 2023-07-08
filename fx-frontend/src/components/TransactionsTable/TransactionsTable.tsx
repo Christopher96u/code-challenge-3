@@ -8,7 +8,10 @@ import {
   TableRow,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { useTransactionsQuery } from "../../hooks/useTransactionsQuery";
+import {
+  TransactionResponse,
+  useTransactionsQuery,
+} from "../../hooks/useTransactionsQuery";
 const tableHeaders: string[] = [
   "Symbol",
   "Source Amount",
@@ -16,59 +19,14 @@ const tableHeaders: string[] = [
   "Fee",
   "Created At",
 ];
-const emptyRows: TableItem[] = [];
-const rows: TableItem[] = [
-  {
-    symbol: "USD",
-    sourceAmount: 159,
-    targetAmount: 6.0,
-    fee: 24,
-    createdAt: 4.0,
-  },
-  {
-    symbol: "AUD",
-    sourceAmount: 237,
-    targetAmount: 9.0,
-    fee: 37,
-    createdAt: 4.3,
-  },
-  {
-    symbol: "EUR",
-    sourceAmount: 262,
-    targetAmount: 16.0,
-    fee: 24,
-    createdAt: 6.0,
-  },
-  {
-    symbol: "PEN",
-    sourceAmount: 305,
-    targetAmount: 3.7,
-    fee: 67,
-    createdAt: 4.3,
-  },
-  {
-    symbol: "COP",
-    sourceAmount: 356,
-    targetAmount: 16.0,
-    fee: 49,
-    createdAt: 3.9,
-  },
-];
-interface TableItem {
-  symbol: string;
-  sourceAmount: number;
-  targetAmount: number;
-  fee: number;
-  createdAt: number;
-}
-
+const emptyRows: TransactionResponse[] = [];
 const TransactionsTable = () => {
   const StyledTableHead = styled(TableHead)(() => ({
     borderTop: "1px solid #e0e0e0",
   }));
-  const { data } = useTransactionsQuery();
-  if (data) {
-    console.log(data);
+  const { data: transations } = useTransactionsQuery();
+  if (!transations) {
+    return <span>Something went wrong</span>;
   }
   return (
     <TableContainer
@@ -86,10 +44,10 @@ const TransactionsTable = () => {
           </TableRow>
         </StyledTableHead>
         <TableBody>
-          {emptyRows.length > 0 ? (
-            rows.map((row, idx) => (
+          {transations.length > 0 ? (
+            transations.map((transaction) => (
               <TableRow
-                key={idx}
+                key={transaction.id}
                 sx={{
                   "&:last-child td, &:last-child th": { border: 0 },
                 }}
@@ -99,17 +57,19 @@ const TransactionsTable = () => {
                   scope="row"
                   sx={{ textAlign: "center" }}
                 >
-                  {row.symbol}
+                  {transaction.symbol}
                 </TableCell>
                 <TableCell sx={{ textAlign: "center" }}>
-                  {row.sourceAmount}
+                  {transaction.sourceAmount}
                 </TableCell>
                 <TableCell sx={{ textAlign: "center" }}>
-                  {row.targetAmount}
+                  {transaction.targetAmount}
                 </TableCell>
-                <TableCell sx={{ textAlign: "center" }}>{row.fee}</TableCell>
                 <TableCell sx={{ textAlign: "center" }}>
-                  {row.createdAt}
+                  {transaction.fee}
+                </TableCell>
+                <TableCell sx={{ textAlign: "center" }}>
+                  {transaction.createdAt}
                 </TableCell>
               </TableRow>
             ))
