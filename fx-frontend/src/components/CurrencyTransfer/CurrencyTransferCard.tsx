@@ -3,8 +3,15 @@ import ImgConvertIcon from "../../assets/converter-icon.png";
 import ImgConverterSwapIcon from "../../assets/converter-swap-icon.png";
 import theme from "../../config/theme";
 import { useCurrenciesQuery } from "../../hooks/useCurrenciesQuery";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CurrencyInputs } from "./CurrencyInputs";
+import { useCurrentRateQuery } from "../../hooks/useCurrentRateQuery";
+export interface CurrencyConversion {
+  currencyFrom: string;
+  currencyTo: string;
+  sourceAmount: number;
+  targetAmount: number;
+}
 const CurrencyTransferCard = () => {
   const StyledButton = styled(Button)({
     backgroundColor: theme.palette.bluePrimary.main,
@@ -16,14 +23,46 @@ const CurrencyTransferCard = () => {
     width: "180px",
   });
   const { data: currencies, isLoading } = useCurrenciesQuery();
-  const [currencyFrom, setCurrencyFrom] = useState(""); //FIX: Remove this state or wrap all the vars in an obj
-  const handleCurrencyChange = (value: string) => {
-    //setCurrencyFrom(value);
+  const [transaction, setTransaction] = useState<CurrencyConversion>({
+    currencyFrom: "AUD",
+    currencyTo: "USD",
+    sourceAmount: 0,
+    targetAmount: 0,
+  });
+  const { data: rates } = useCurrentRateQuery(transaction);
+  const handleCurrencyChange = (value: string, identifier: string) => {
+    if (identifier === "currencyFrom") {
+      setTransaction({
+        ...transaction,
+        currencyFrom: value,
+      });
+      return;
+    }
+    setTransaction({
+      ...transaction,
+      currencyTo: value,
+    });
     console.log("value from parent: ", value);
   };
-  const handleAmountMoneyChange = (value: number) => {
+  const handleAmountMoneyChange = (value: number, identifier: string) => {
+    if (identifier === "sourceAmount") {
+      setTransaction({
+        ...transaction,
+        sourceAmount: value,
+      });
+      return;
+    }
+    setTransaction({
+      ...transaction,
+      targetAmount: value,
+    });
     console.log("value from parent...: ", value);
   };
+  useEffect(() => {
+    if (transaction.sourceAmount > 0 || transaction.targetAmount > 0) {
+      console.log("transaction API CALL: ", transaction);
+    }
+  }, [transaction]);
   if (isLoading) {
     return <span>Loading...</span>;
   }
@@ -60,8 +99,13 @@ const CurrencyTransferCard = () => {
           <Box sx={{ mb: 3 }}>
             <CurrencyInputs
               currencies={currencies}
-              onCurrencyChange={handleCurrencyChange}
-              onAmountMoneyChange={handleAmountMoneyChange}
+              onCurrencyChange={(value) =>
+                handleCurrencyChange(value, "currencyFrom")
+              }
+              onAmountMoneyChange={(value) =>
+                handleAmountMoneyChange(value, "sourceAmount")
+              }
+              defaultCurrency={transaction.currencyFrom}
             />
           </Box>
           <Box sx={{ mx: "auto", textAlign: "center" }}>
@@ -76,10 +120,14 @@ const CurrencyTransferCard = () => {
           <Box sx={{ mt: 3 }}>
             <CurrencyInputs
               isFrom={false}
-              defaultCurrency="USD"
+              defaultCurrency={transaction.currencyTo}
               currencies={currencies}
-              onCurrencyChange={handleCurrencyChange}
-              onAmountMoneyChange={handleAmountMoneyChange}
+              onCurrencyChange={(value) =>
+                handleCurrencyChange(value, "currencyTo")
+              }
+              onAmountMoneyChange={(value) =>
+                handleAmountMoneyChange(value, "targetAmount")
+              }
             />
           </Box>
           <Box
@@ -90,7 +138,14 @@ const CurrencyTransferCard = () => {
           >
             <Typography>Market Rate: 1.20433</Typography>
             <Typography>Fee: 669.34 USD</Typography>
-            <StyledButton variant="contained">Submit</StyledButton>
+            <StyledButton
+              variant="contained"
+              onClick={() => {
+                console.log(transaction);
+              }}
+            >
+              Submit
+            </StyledButton>
           </Box>
         </Grid>
       </Grid>
