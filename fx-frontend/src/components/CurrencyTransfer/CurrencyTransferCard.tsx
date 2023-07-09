@@ -10,10 +10,11 @@ import ImgConvertIcon from "../../assets/converter-icon.png";
 import ImgConverterSwapIcon from "../../assets/converter-swap-icon.png";
 import theme from "../../config/theme";
 import { useCurrenciesQuery } from "../../hooks/useCurrenciesQuery";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CurrencyInputs } from "./CurrencyInputs";
 import { useCurrentRateQuery } from "../../hooks/useCurrentRateQuery";
 import ConfettiExplosion from "react-confetti-explosion";
+import { useTransactionMutation } from "../../hooks/useTransactionMutation";
 export interface CurrencyConversion {
   currencyFrom: string;
   currencyTo: string;
@@ -31,6 +32,7 @@ const CurrencyTransferCard = () => {
     padding: "0 30px",
     width: "180px",
   });
+  let timeoutId: NodeJS.Timeout;
   const { data: currencies, isLoading } = useCurrenciesQuery();
   const [currencyFrom, setCurrencyFrom] = useState("AUD");
   const [currencyTo, setCurrencyTo] = useState("USD");
@@ -45,9 +47,20 @@ const CurrencyTransferCard = () => {
     targetAmount,
     isTargetAmountProvided,
   });
+  const { mutate, isLoading: isMutationLoading } = useTransactionMutation({
+    currencyFrom,
+    currencyTo,
+    sourceAmount,
+    targetAmount,
+    fxRate: currentRates?.fxRate!,
+    fee: currentRates?.fee!,
+    marketRate: currentRates?.marketRate!,
+  });
   const handleConfettiExplosion = () => {
+    console.log("handleConfettiExplosion clicked!");
     setIsExploding(true);
-    setTimeout(() => {
+    mutate();
+    timeoutId = setTimeout(() => {
       setIsExploding(false);
     }, 3000);
   };
@@ -75,6 +88,11 @@ const CurrencyTransferCard = () => {
     setCurrencyFrom(currencyTo);
     setCurrencyTo(currencyFrom);
   };
+  useEffect(() => {
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  });
   if (isLoading) {
     return <span>Loading...</span>;
   }
@@ -166,7 +184,11 @@ const CurrencyTransferCard = () => {
                 ? currentRates.currencyFrom
                 : currentRates?.currencyTo}
             </Typography>
-            <StyledButton variant="contained" onClick={handleConfettiExplosion}>
+            <StyledButton
+              variant="contained"
+              onClick={handleConfettiExplosion}
+              disabled={isMutationLoading}
+            >
               Submit{" "}
               {isExploding && (
                 <ConfettiExplosion

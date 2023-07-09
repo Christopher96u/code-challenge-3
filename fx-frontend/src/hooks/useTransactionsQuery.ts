@@ -1,13 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import { baseApiClient } from "../api/baseApi";
 
-export interface TransactionResponse {
+export interface TransactionResponse extends Transaction {
   id: number;
   createdAt: string;
-  fee: number;
+}
+export interface Transaction {
+  currencyFrom: string;
+  currencyTo: string;
   sourceAmount: number;
-  symbol: string;
   targetAmount: number;
+  fee: number;
+  fxRate: number;
+  marketRate: number;
 }
 // This assures the hook below is the only way to fetch the currencies
 const getTransactions = async (): Promise<TransactionResponse[]> => {
