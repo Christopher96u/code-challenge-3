@@ -1,4 +1,5 @@
 import {
+  IconButton,
   Paper,
   Table,
   TableBody,
@@ -8,23 +9,30 @@ import {
   TableRow,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import {
-  TransactionResponse,
-  useTransactionsQuery,
-} from "../../hooks/useTransactionsQuery";
+import { useTransactionsQuery } from "../../hooks/useTransactionsQuery";
+import { Delete } from "@mui/icons-material";
+import { useTransactionRemoveMutation } from "../../hooks/useTransactionRemoveMutation";
+import { useEffect, useState } from "react";
 const tableHeaders: string[] = [
   "Symbol",
   "Source Amount",
   "Target Amount",
   "Fee",
   "Created At",
+  "Remove",
 ];
-const emptyRows: TransactionResponse[] = [];
 const TransactionsTable = () => {
+  const [selectedId, setSelectedId] = useState(0);
+  const { mutate } = useTransactionRemoveMutation(selectedId);
   const StyledTableHead = styled(TableHead)(() => ({
     borderTop: "1px solid #e0e0e0",
   }));
   const { data: transations } = useTransactionsQuery();
+  const handleOnRemoveTransaction = (id: number) => {
+    setSelectedId(id);
+    mutate();
+  };
+  useEffect(() => {}, [selectedId]);
   if (!transations) {
     return <span>Something went wrong</span>;
   }
@@ -39,6 +47,7 @@ const TransactionsTable = () => {
             {tableHeaders.map((header, index) => (
               <TableCell key={index} sx={{ textAlign: "center" }}>
                 {header}
+                {index === tableHeaders.length - 1 && <span>RemoveIcon</span>}
               </TableCell>
             ))}
           </TableRow>
@@ -57,7 +66,7 @@ const TransactionsTable = () => {
                   scope="row"
                   sx={{ textAlign: "center" }}
                 >
-                  {transaction.symbol}
+                  {transaction.currencyTo}
                 </TableCell>
                 <TableCell sx={{ textAlign: "center" }}>
                   {transaction.sourceAmount}
@@ -70,6 +79,18 @@ const TransactionsTable = () => {
                 </TableCell>
                 <TableCell sx={{ textAlign: "center" }}>
                   {transaction.createdAt}
+                </TableCell>
+                <TableCell sx={{ textAlign: "center" }}>
+                  {
+                    <IconButton
+                      aria-label="delete"
+                      onClick={() => handleOnRemoveTransaction(transaction.id)}
+                      size="medium"
+                      color="error"
+                    >
+                      <Delete fontSize="inherit" />
+                    </IconButton>
+                  }
                 </TableCell>
               </TableRow>
             ))

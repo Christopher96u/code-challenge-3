@@ -1,10 +1,12 @@
-import { Container } from "@mui/material";
+import { Container, Typography } from "@mui/material";
 import { TransactionsTable } from "../components/TransactionsTable/TransactionsTable";
 
 export const Transactions = () => {
   return (
     <div>
-      <h1>Transactions</h1>
+      <Typography variant="h4" textAlign="center" my={6}>
+        Transactions
+      </Typography>
       <Container
         maxWidth={false}
         sx={{ display: "flex", justifyContent: "center" }}
