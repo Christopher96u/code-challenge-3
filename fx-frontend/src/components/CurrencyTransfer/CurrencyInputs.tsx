@@ -1,6 +1,6 @@
 import { MenuItem, TextField } from "@mui/material";
 import { Currency } from "../../hooks/useCurrenciesQuery";
-import { ChangeEvent, useEffect } from "react";
+import { ChangeEvent } from "react";
 
 interface CurrencyInputsProps {
   currencies: Currency[];
@@ -16,11 +16,7 @@ const CurrencyInputs = ({
   defaultCurrency,
   isFrom = true,
 }: CurrencyInputsProps) => {
-  useEffect(() => {
-    console.log("CURRENCY INPUTS RENDER");
-  }, []);
   const handleOnCurrencyChange = (e: ChangeEvent<HTMLInputElement>) => {
-    console.log("value from child: ", e.target.value);
     onCurrencyChange(e.target.value);
   };
   const handleOnAmountMoneyChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -28,8 +24,7 @@ const CurrencyInputs = ({
     if (value <= 0) {
       return;
     }
-    console.log("value from child...: ", value);
-    onAmountMoneyChange(value);
+    onAmountMoneyChange(Number(event.target.value));
   };
   return (
     <>

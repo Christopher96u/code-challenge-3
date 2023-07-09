@@ -11,6 +11,9 @@ export interface CurrencyConversion {
   currencyTo: string;
   sourceAmount: number;
   targetAmount: number;
+  /* fxRate: number;
+  marketRate: number;
+  fee: number; */
 }
 const CurrencyTransferCard = () => {
   const StyledButton = styled(Button)({
@@ -23,51 +26,71 @@ const CurrencyTransferCard = () => {
     width: "180px",
   });
   const { data: currencies, isLoading } = useCurrenciesQuery();
-  const [transaction, setTransaction] = useState<CurrencyConversion>({
+  /* const [transaction, setTransaction] = useState<CurrencyConversion>({
     currencyFrom: "AUD",
     currencyTo: "USD",
     sourceAmount: 0,
     targetAmount: 0,
+  }); */
+  const [currencyFrom, setCurrencyFrom] = useState("AUD");
+  const [currencyTo, setCurrencyTo] = useState("USD");
+  const [sourceAmount, setSourceAmount] = useState(0);
+  const [targetAmount, setTargetAmount] = useState(0);
+  const [lastCurrencyFrom, setLastCurrencyFrom] = useState("AUD");
+  const { data: currentRates } = useCurrentRateQuery({
+    currencyFrom,
+    currencyTo,
+    sourceAmount,
+    targetAmount,
   });
-  const { data: rates } = useCurrentRateQuery(transaction);
-  const handleCurrencyChange = (value: string, identifier: string) => {
-    if (identifier === "currencyFrom") {
-      setTransaction({
-        ...transaction,
-        currencyFrom: value,
-      });
+  const handleConversion = () => {
+    console.log("handleConversion fn", { currentRates });
+    if (!currentRates) {
       return;
     }
-    setTransaction({
-      ...transaction,
-      currencyTo: value,
-    });
-    console.log("value from parent: ", value);
+    /* if (currentRates) {
+      console.log("currentRates: ", currentRates);
+      console.log("sourceAmount: ", sourceAmount);
+      console.log(
+        "currentRates.rates[currencyFrom]: ",
+        currentRates.rates[currencyFrom]
+      );
+      console.log(
+        "currentRates.rates[currencyTo]: ",
+        currentRates.rates[currencyTo]
+      );
+      const usdAmount = sourceAmount / currentRates.rates[currencyFrom];
+      console.log("usdAmount:  =========>", usdAmount);
+      const amountMoneyTo = usdAmount * currentRates.rates[currencyTo];
+      console.log("amountMoneyTo:  =========>", amountMoneyTo);
+    } */
+  };
+  const handleCurrencyChange = (value: string, identifier: string) => {
+    if (identifier === "currencyFrom") {
+      //console.log("currencyFrom: ", value);
+      setCurrencyFrom(value);
+      setLastCurrencyFrom(
+        value === currencyTo ? lastCurrencyFrom : currencyFrom
+      );
+    } else {
+      setCurrencyTo(value);
+    }
   };
   const handleAmountMoneyChange = (value: number, identifier: string) => {
     if (identifier === "sourceAmount") {
-      setTransaction({
-        ...transaction,
-        sourceAmount: value,
-      });
-      return;
+      setSourceAmount(value);
+    } else {
+      setTargetAmount(value);
     }
-    setTransaction({
-      ...transaction,
-      targetAmount: value,
-    });
-    console.log("value from parent...: ", value);
   };
-  useEffect(() => {
-    if (transaction.sourceAmount > 0 || transaction.targetAmount > 0) {
-      console.log("transaction API CALL: ", transaction);
-    }
-  }, [transaction]);
   if (isLoading) {
     return <span>Loading...</span>;
   }
   if (!currencies) {
     return <span>Something went wrong</span>;
+  }
+  if (currentRates) {
+    console.log("currentRates: ", currentRates);
   }
   return (
     <Box>
@@ -105,7 +128,7 @@ const CurrencyTransferCard = () => {
               onAmountMoneyChange={(value) =>
                 handleAmountMoneyChange(value, "sourceAmount")
               }
-              defaultCurrency={transaction.currencyFrom}
+              defaultCurrency={currencyFrom}
             />
           </Box>
           <Box sx={{ mx: "auto", textAlign: "center" }}>
@@ -120,7 +143,7 @@ const CurrencyTransferCard = () => {
           <Box sx={{ mt: 3 }}>
             <CurrencyInputs
               isFrom={false}
-              defaultCurrency={transaction.currencyTo}
+              defaultCurrency={currencyTo}
               currencies={currencies}
               onCurrencyChange={(value) =>
                 handleCurrencyChange(value, "currencyTo")
@@ -136,12 +159,12 @@ const CurrencyTransferCard = () => {
               marginTop: 2,
             }}
           >
-            <Typography>Market Rate: 1.20433</Typography>
+            <Typography>Market Rate: {123}</Typography>
             <Typography>Fee: 669.34 USD</Typography>
             <StyledButton
               variant="contained"
               onClick={() => {
-                console.log(transaction);
+                console.log();
               }}
             >
               Submit
