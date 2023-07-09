@@ -1,14 +1,19 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { baseApiClient } from "../api/baseApi";
-const removeTransaction = async (transactionId: number): Promise<any> => {
+import { cachingKeys } from "../utils/constants";
+export interface DeleteResponse {
+  raw: any[];
+  affected: number;
+}
+const removeTransaction = async (
+  transactionId: number
+): Promise<DeleteResponse | undefined> => {
   try {
-    const response = await baseApiClient.delete<any>(
+    const response = await baseApiClient.delete<DeleteResponse>(
       `/transactions/${transactionId}`
     );
-    console.log("Transaction removed", response.data);
     return response.data;
   } catch (error) {
-    //TODO: Handle error in a better way
     console.error("Error removing a transaction", error);
   }
 };
@@ -17,7 +22,7 @@ export function useTransactionRemoveMutation(transactionId: number) {
   return useMutation({
     mutationFn: () => removeTransaction(transactionId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      queryClient.invalidateQueries({ queryKey: [cachingKeys.transactions] });
     },
   });
 }

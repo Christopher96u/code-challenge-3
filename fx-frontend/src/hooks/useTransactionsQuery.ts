@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { baseApiClient } from "../api/baseApi";
+import { cachingKeys } from "../utils/constants";
 
 export interface TransactionResponse extends Transaction {
   id: number;
@@ -22,14 +23,13 @@ const getTransactions = async (): Promise<TransactionResponse[]> => {
     );
     return response.data;
   } catch (error) {
-    //TODO: Handle error in a better way
     console.error("Error getting the transactions", error);
     return [];
   }
 };
 export function useTransactionsQuery() {
   return useQuery({
-    queryKey: ["transactions"],
+    queryKey: [cachingKeys.transactions],
     queryFn: () => getTransactions(),
   });
 }

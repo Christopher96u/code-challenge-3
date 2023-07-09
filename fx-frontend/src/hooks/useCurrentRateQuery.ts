@@ -23,7 +23,6 @@ const getCurrentRate = async (
   currencyConversion: CurrencyConversion
 ): Promise<CurrencyConversionResult | undefined> => {
   try {
-    console.log("CALLING API WITH THESE VALUES =>", currencyConversion);
     const response = await openExchangeApiClient.get<OpenExchangeApiResponse>(
       "/latest.json",
       {
@@ -38,7 +37,6 @@ const getCurrentRate = async (
       openExchangeApiResponse
     );
   } catch (error) {
-    //TODO: Handle error in a better way
     console.error("Error getting the current rate", error);
   }
 };
@@ -53,7 +51,6 @@ export function useCurrentRateQuery(currencyConversion: CurrencyConversion) {
     ],
     cacheTime: 0,
     queryFn: () => getCurrentRate(currencyConversion),
-    /* enabled: canCallFn(currencyConversion), */
     refetchOnWindowFocus: false,
   });
 }

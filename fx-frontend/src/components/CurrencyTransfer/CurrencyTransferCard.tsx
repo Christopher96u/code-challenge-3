@@ -57,7 +57,6 @@ const CurrencyTransferCard = () => {
     marketRate: currentRates?.marketRate!,
   });
   const handleConfettiExplosion = () => {
-    console.log("handleConfettiExplosion clicked!");
     setIsExploding(true);
     mutate();
     timeoutId = setTimeout(() => {
@@ -74,13 +73,11 @@ const CurrencyTransferCard = () => {
   const handleAmountMoneyChange = (value: number, identifier: string) => {
     if (identifier === "sourceAmount") {
       setSourceAmount(value);
-      console.log("currentRate to SEND", currentRates?.targetAmount);
       setTargetAmount(currentRates?.targetAmount || 0);
     } else {
       // Target amount changed, so in this case we will update the source amount
       setIsTargetAmountProvided(true);
       setTargetAmount(value);
-      console.log("currentRate to SEND", currentRates?.sourceAmount);
       setSourceAmount(currentRates?.sourceAmount || 0);
     }
   };
@@ -99,17 +96,29 @@ const CurrencyTransferCard = () => {
   if (!currencies) {
     return <span>Something went wrong</span>;
   }
-  if (currentRates) {
-    console.log("currentRates: ", currentRates);
-  }
   return (
     <Box>
-      <Typography variant="h4" textAlign="center" my={6}>
+      <Typography variant="h4" textAlign="center" mt={6}>
         Currency Converter
       </Typography>
-      <Grid container justifyContent="center">
-        <Grid item xs={12} sm={7} md={5} lg={4} xl={3} sx={{ px: 1 }}>
-          <Box sx={{ display: "flex" }} px={{ sm: 4 }}>
+      <Grid
+        container
+        justifyContent="center"
+        py={6}
+        bgcolor={theme.palette.blueTertiary.main}
+      >
+        <Grid
+          item
+          xs={12}
+          sm={7}
+          md={5}
+          lg={4}
+          xl={3}
+          sx={{ px: 1 }}
+          bgcolor={theme.palette.blueBackground.main}
+          borderRadius={4}
+        >
+          <Box sx={{ display: "flex" }}>
             <Box sx={{}}>
               <img
                 src={ImgConvertIcon}
@@ -178,10 +187,19 @@ const CurrencyTransferCard = () => {
             sx={{
               textAlign: "center",
               marginTop: 2,
+              mb: 3,
             }}
           >
-            <Typography>Market Rate: {currentRates?.fxRate}</Typography>
-            <Typography>
+            <Typography
+              color={theme.palette.blueTertiary.main}
+              fontWeight={"bold"}
+            >
+              Market Rate: {currentRates?.fxRate}
+            </Typography>
+            <Typography
+              color={theme.palette.blueTertiary.main}
+              fontWeight={"bold"}
+            >
               Fee: {currentRates?.fee}{" "}
               {currentRates?.isTargetAmountProvided
                 ? currentRates.currencyFrom

@@ -12,15 +12,8 @@ import { styled } from "@mui/material/styles";
 import { useTransactionsQuery } from "../../hooks/useTransactionsQuery";
 import { Delete } from "@mui/icons-material";
 import { useTransactionRemoveMutation } from "../../hooks/useTransactionRemoveMutation";
-import { useEffect, useState } from "react";
-const tableHeaders: string[] = [
-  "Symbol",
-  "Source Amount",
-  "Target Amount",
-  "Fee",
-  "Created At",
-  "Remove",
-];
+import { useState } from "react";
+import { tableHeaders } from "../../utils/constants";
 const TransactionsTable = () => {
   const [selectedId, setSelectedId] = useState(0);
   const { mutate } = useTransactionRemoveMutation(selectedId);
@@ -32,7 +25,6 @@ const TransactionsTable = () => {
     setSelectedId(id);
     mutate();
   };
-  useEffect(() => {}, [selectedId]);
   if (!transations) {
     return <span>Something went wrong</span>;
   }
@@ -47,7 +39,6 @@ const TransactionsTable = () => {
             {tableHeaders.map((header, index) => (
               <TableCell key={index} sx={{ textAlign: "center" }}>
                 {header}
-                {index === tableHeaders.length - 1 && <span>RemoveIcon</span>}
               </TableCell>
             ))}
           </TableRow>

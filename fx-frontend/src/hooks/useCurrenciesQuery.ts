@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { openExchangeApiClient } from "../api/openExchangeApi";
+import { cachingKeys } from "../utils/constants";
 type CurrencyDictionary = {
   [key: string]: string;
 };
@@ -22,14 +23,13 @@ const getCurrencies = async (): Promise<Currency[]> => {
     );
     return transformedCurrencies;
   } catch (error) {
-    //TODO: Handle error in a better way
     console.error("Error getting the currencies", error);
     return [];
   }
 };
 export function useCurrenciesQuery() {
   return useQuery({
-    queryKey: ["currencies"],
+    queryKey: [cachingKeys.currencies],
     queryFn: () => getCurrencies(),
     staleTime: 60 * 60 * 1000, // 1 hour
   });

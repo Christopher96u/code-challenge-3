@@ -4,21 +4,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Container from "@mui/material/Container";
 import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
-
-interface Route {
-  path: string;
-  displayName: string;
-}
-const routes: Route[] = [
-  {
-    path: "/currency-converter",
-    displayName: "Currency Converter",
-  },
-  {
-    path: "/transactions",
-    displayName: "Transactions",
-  },
-];
+import { routes } from "../../utils/constants";
 const ResponsiveAppBar = () => {
   const navigate = useNavigate();
   return (
