@@ -36,4 +36,9 @@ export class CreateTransactionDto {
   @IsPositive()
   @IsNotEmpty()
   readonly marketRate: number;
+
+  @IsNumber()
+  @IsPositive()
+  @IsNotEmpty()
+  readonly fxRate: number;
 }
