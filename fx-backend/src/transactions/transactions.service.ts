@@ -18,6 +18,6 @@ export class TransactionsService {
     );
   }
   remove(id: number): any {
-    return id;
+    return this.transactionsRepository.delete(id);
   }
 }
