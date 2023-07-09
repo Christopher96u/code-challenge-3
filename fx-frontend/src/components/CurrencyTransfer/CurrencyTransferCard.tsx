@@ -1,9 +1,16 @@
-import { Box, Button, Grid, Typography, styled } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  IconButton,
+  Typography,
+  styled,
+} from "@mui/material";
 import ImgConvertIcon from "../../assets/converter-icon.png";
 import ImgConverterSwapIcon from "../../assets/converter-swap-icon.png";
 import theme from "../../config/theme";
 import { useCurrenciesQuery } from "../../hooks/useCurrenciesQuery";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CurrencyInputs } from "./CurrencyInputs";
 import { useCurrentRateQuery } from "../../hooks/useCurrentRateQuery";
 export interface CurrencyConversion {
@@ -11,9 +18,7 @@ export interface CurrencyConversion {
   currencyTo: string;
   sourceAmount: number;
   targetAmount: number;
-  /* fxRate: number;
-  marketRate: number;
-  fee: number; */
+  isTargetAmountProvided: boolean;
 }
 const CurrencyTransferCard = () => {
   const StyledButton = styled(Button)({
@@ -26,52 +31,21 @@ const CurrencyTransferCard = () => {
     width: "180px",
   });
   const { data: currencies, isLoading } = useCurrenciesQuery();
-  /* const [transaction, setTransaction] = useState<CurrencyConversion>({
-    currencyFrom: "AUD",
-    currencyTo: "USD",
-    sourceAmount: 0,
-    targetAmount: 0,
-  }); */
   const [currencyFrom, setCurrencyFrom] = useState("AUD");
   const [currencyTo, setCurrencyTo] = useState("USD");
   const [sourceAmount, setSourceAmount] = useState(0);
   const [targetAmount, setTargetAmount] = useState(0);
-  const [lastCurrencyFrom, setLastCurrencyFrom] = useState("AUD");
+  const [isTargetAmountProvided, setIsTargetAmountProvided] = useState(false);
   const { data: currentRates } = useCurrentRateQuery({
     currencyFrom,
     currencyTo,
     sourceAmount,
     targetAmount,
+    isTargetAmountProvided,
   });
-  const handleConversion = () => {
-    console.log("handleConversion fn", { currentRates });
-    if (!currentRates) {
-      return;
-    }
-    /* if (currentRates) {
-      console.log("currentRates: ", currentRates);
-      console.log("sourceAmount: ", sourceAmount);
-      console.log(
-        "currentRates.rates[currencyFrom]: ",
-        currentRates.rates[currencyFrom]
-      );
-      console.log(
-        "currentRates.rates[currencyTo]: ",
-        currentRates.rates[currencyTo]
-      );
-      const usdAmount = sourceAmount / currentRates.rates[currencyFrom];
-      console.log("usdAmount:  =========>", usdAmount);
-      const amountMoneyTo = usdAmount * currentRates.rates[currencyTo];
-      console.log("amountMoneyTo:  =========>", amountMoneyTo);
-    } */
-  };
   const handleCurrencyChange = (value: string, identifier: string) => {
     if (identifier === "currencyFrom") {
-      //console.log("currencyFrom: ", value);
       setCurrencyFrom(value);
-      setLastCurrencyFrom(
-        value === currencyTo ? lastCurrencyFrom : currencyFrom
-      );
     } else {
       setCurrencyTo(value);
     }
@@ -79,9 +53,19 @@ const CurrencyTransferCard = () => {
   const handleAmountMoneyChange = (value: number, identifier: string) => {
     if (identifier === "sourceAmount") {
       setSourceAmount(value);
+      console.log("currentRate to SEND", currentRates?.targetAmount);
+      setTargetAmount(currentRates?.targetAmount || 0);
     } else {
+      // Target amount changed, so in this case we will update the source amount
+      setIsTargetAmountProvided(true);
       setTargetAmount(value);
+      console.log("currentRate to SEND", currentRates?.sourceAmount);
+      setSourceAmount(currentRates?.sourceAmount || 0);
     }
+  };
+  const handleSwitchCurrencies = () => {
+    setCurrencyFrom(currencyTo);
+    setCurrencyTo(currencyFrom);
   };
   if (isLoading) {
     return <span>Loading...</span>;
@@ -129,19 +113,27 @@ const CurrencyTransferCard = () => {
                 handleAmountMoneyChange(value, "sourceAmount")
               }
               defaultCurrency={currencyFrom}
+              inputValue={sourceAmount}
             />
           </Box>
           <Box sx={{ mx: "auto", textAlign: "center" }}>
-            <img
-              src={ImgConverterSwapIcon}
-              alt="Swap Icon"
-              height={25}
-              width={25}
-              style={{ cursor: "pointer" }}
-            />
+            <IconButton
+              onClick={handleSwitchCurrencies}
+              aria-label="Switch currency button"
+              color="primary"
+            >
+              <img
+                src={ImgConverterSwapIcon}
+                alt="Swap Icon"
+                height={25}
+                width={25}
+                style={{ cursor: "pointer" }}
+              />
+            </IconButton>
           </Box>
           <Box sx={{ mt: 3 }}>
             <CurrencyInputs
+              inputValue={targetAmount}
               isFrom={false}
               defaultCurrency={currencyTo}
               currencies={currencies}
@@ -159,8 +151,13 @@ const CurrencyTransferCard = () => {
               marginTop: 2,
             }}
           >
-            <Typography>Market Rate: {123}</Typography>
-            <Typography>Fee: 669.34 USD</Typography>
+            <Typography>Market Rate: {currentRates?.fxRate}</Typography>
+            <Typography>
+              Fee: {currentRates?.fee}{" "}
+              {currentRates?.isTargetAmountProvided
+                ? currentRates.currencyFrom
+                : currentRates?.currencyTo}
+            </Typography>
             <StyledButton
               variant="contained"
               onClick={() => {

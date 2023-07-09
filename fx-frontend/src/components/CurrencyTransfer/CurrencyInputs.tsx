@@ -8,6 +8,7 @@ interface CurrencyInputsProps {
   onAmountMoneyChange: (value: number) => void;
   defaultCurrency: string;
   isFrom?: boolean;
+  inputValue: number;
 }
 const CurrencyInputs = ({
   currencies,
@@ -15,6 +16,7 @@ const CurrencyInputs = ({
   onAmountMoneyChange,
   defaultCurrency,
   isFrom = true,
+  inputValue,
 }: CurrencyInputsProps) => {
   const handleOnCurrencyChange = (e: ChangeEvent<HTMLInputElement>) => {
     onCurrencyChange(e.target.value);
@@ -46,6 +48,7 @@ const CurrencyInputs = ({
         size="small"
         variant="outlined"
         type="number"
+        value={inputValue}
         onChange={handleOnAmountMoneyChange}
       />
     </>

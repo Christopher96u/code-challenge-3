@@ -1,42 +1,42 @@
 import { useQuery } from "@tanstack/react-query";
 import { openExchangeApiClient } from "../api/openExchangeApi";
 import { CurrencyConversion } from "../components/CurrencyTransfer/CurrencyTransferCard";
-/* export interface CurrentRate {
+import { calculateCurrencyConversion } from "../utils/calculateCurrencyConversion";
+export interface CurrencyConversionResult {
+  marketRate: number;
+  fxRate: number;
+  currencyFrom: string;
+  currencyTo: string;
+  sourceAmount: number;
+  targetAmount: number;
+  fee: number;
+  isTargetAmountProvided?: boolean;
+}
+export interface OpenExchangeApiResponse {
   rates: {
     [currency: string]: number;
   };
-} */
+}
+
 // This assures the hook below is the only way to fetch the current rate
 const getCurrentRate = async (
   currencyConversion: CurrencyConversion
-): Promise<any> => {
+): Promise<CurrencyConversionResult | undefined> => {
   try {
     console.log("CALLING API WITH THESE VALUES =>", currencyConversion);
-    const response = await openExchangeApiClient.get<any>("/latest.json", {
-      params: {
-        symbols: `${currencyConversion.currencyFrom},${currencyConversion.currencyTo}`,
-      },
-    });
-    const openExchangeApiResponse = response.data;
-    const marketRate = Number(
-      (
-        (1 / openExchangeApiResponse.rates[currencyConversion.currencyFrom]) *
-        openExchangeApiResponse.rates[currencyConversion.currencyTo]
-      ).toFixed(5)
+    const response = await openExchangeApiClient.get<OpenExchangeApiResponse>(
+      "/latest.json",
+      {
+        params: {
+          symbols: `${currencyConversion.currencyFrom},${currencyConversion.currencyTo}`,
+        },
+      }
     );
-    const fxRate = Number((marketRate * 1.01).toFixed(5)); // Use a flag to change the 1.01 to 0.99
-    const sourceAmount = currencyConversion.sourceAmount;
-    const targetAmount = Number((sourceAmount * fxRate).toFixed(5));
-    const fee = Math.abs(Number((sourceAmount - targetAmount).toFixed(2))); // Probably change this based on a flag
-    return {
-      marketRate,
-      fxRate,
-      currencyFrom: currencyConversion.currencyFrom,
-      currencyTo: currencyConversion.currencyTo,
-      sourceAmount,
-      targetAmount,
-      fee,
-    };
+    const openExchangeApiResponse = response.data;
+    return calculateCurrencyConversion(
+      currencyConversion,
+      openExchangeApiResponse
+    );
   } catch (error) {
     //TODO: Handle error in a better way
     console.error("Error getting the current rate", error);
@@ -45,10 +45,11 @@ const getCurrentRate = async (
 export function useCurrentRateQuery(currencyConversion: CurrencyConversion) {
   return useQuery({
     queryKey: [
-      "currentRate",
       currencyConversion.currencyFrom,
       currencyConversion.currencyTo,
       currencyConversion.sourceAmount,
+      currencyConversion.targetAmount,
+      currencyConversion.isTargetAmountProvided,
     ],
     cacheTime: 0,
     queryFn: () => getCurrentRate(currencyConversion),
