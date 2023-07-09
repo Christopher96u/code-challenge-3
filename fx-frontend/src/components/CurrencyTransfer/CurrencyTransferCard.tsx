@@ -13,6 +13,7 @@ import { useCurrenciesQuery } from "../../hooks/useCurrenciesQuery";
 import { useState } from "react";
 import { CurrencyInputs } from "./CurrencyInputs";
 import { useCurrentRateQuery } from "../../hooks/useCurrentRateQuery";
+import ConfettiExplosion from "react-confetti-explosion";
 export interface CurrencyConversion {
   currencyFrom: string;
   currencyTo: string;
@@ -36,6 +37,7 @@ const CurrencyTransferCard = () => {
   const [sourceAmount, setSourceAmount] = useState(0);
   const [targetAmount, setTargetAmount] = useState(0);
   const [isTargetAmountProvided, setIsTargetAmountProvided] = useState(false);
+  const [isExploding, setIsExploding] = useState(false);
   const { data: currentRates } = useCurrentRateQuery({
     currencyFrom,
     currencyTo,
@@ -43,6 +45,12 @@ const CurrencyTransferCard = () => {
     targetAmount,
     isTargetAmountProvided,
   });
+  const handleConfettiExplosion = () => {
+    setIsExploding(true);
+    setTimeout(() => {
+      setIsExploding(false);
+    }, 3000);
+  };
   const handleCurrencyChange = (value: string, identifier: string) => {
     if (identifier === "currencyFrom") {
       setCurrencyFrom(value);
@@ -158,13 +166,15 @@ const CurrencyTransferCard = () => {
                 ? currentRates.currencyFrom
                 : currentRates?.currencyTo}
             </Typography>
-            <StyledButton
-              variant="contained"
-              onClick={() => {
-                console.log();
-              }}
-            >
-              Submit
+            <StyledButton variant="contained" onClick={handleConfettiExplosion}>
+              Submit{" "}
+              {isExploding && (
+                <ConfettiExplosion
+                  duration={4000}
+                  particleCount={250}
+                  width={1500}
+                />
+              )}
             </StyledButton>
           </Box>
         </Grid>
