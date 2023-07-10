@@ -61,10 +61,11 @@ const CurrencyTransferCard = () => {
   const handleConfettiExplosion = () => {
     setIsExploding(true);
     mutate();
-    timeoutId = setTimeout(() => {
-      setIsExploding(false);
+    setTimeout(() => {
       navigate("/transactions");
-    }, 3000);
+      setSourceAmount(0);
+      setTargetAmount(0);
+    }, 2000);
   };
   const handleCurrencyChange = (value: string, identifier: string) => {
     if (identifier === "currencyFrom") {
