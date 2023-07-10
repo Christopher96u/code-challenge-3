@@ -15,6 +15,7 @@ import { CurrencyInputs } from "./CurrencyInputs";
 import { useCurrentRateQuery } from "../../hooks/useCurrentRateQuery";
 import ConfettiExplosion from "react-confetti-explosion";
 import { useTransactionMutation } from "../../hooks/useTransactionMutation";
+import { useNavigate } from "react-router-dom";
 export interface CurrencyConversion {
   currencyFrom: string;
   currencyTo: string;
@@ -40,6 +41,7 @@ const CurrencyTransferCard = () => {
   const [targetAmount, setTargetAmount] = useState(0);
   const [isTargetAmountProvided, setIsTargetAmountProvided] = useState(false);
   const [isExploding, setIsExploding] = useState(false);
+  const navigate = useNavigate();
   const { data: currentRates } = useCurrentRateQuery({
     currencyFrom,
     currencyTo,
@@ -61,6 +63,7 @@ const CurrencyTransferCard = () => {
     mutate();
     timeoutId = setTimeout(() => {
       setIsExploding(false);
+      navigate("/transactions");
     }, 3000);
   };
   const handleCurrencyChange = (value: string, identifier: string) => {
