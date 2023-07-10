@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Transaction } from './entities/transaction.entity';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 @Injectable()
 export class TransactionsService {
   constructor(
@@ -17,7 +17,7 @@ export class TransactionsService {
       this.transactionsRepository.create(createTransactionDto),
     );
   }
-  remove(id: number): any {
+  remove(id: number): Promise<DeleteResult> {
     return this.transactionsRepository.delete(id);
   }
 }

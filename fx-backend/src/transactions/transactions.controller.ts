@@ -10,6 +10,7 @@ import {
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { Transaction } from './entities/transaction.entity';
+import { DeleteResult } from 'typeorm';
 
 @Controller('transactions')
 export class TransactionsController {
@@ -27,7 +28,7 @@ export class TransactionsController {
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
+  remove(@Param('id', ParseIntPipe) id: number): Promise<DeleteResult> {
     return this.transactionsService.remove(id);
   }
 }
